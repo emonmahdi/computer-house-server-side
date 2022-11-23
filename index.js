@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kwieioj.mongodb.net/?retryWrites=true&w=majority`;
 console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 }); 
@@ -30,6 +30,28 @@ async function run(){
       const result = await cursor.toArray();
       res.send(result);
       console.log(result); 
+    });
+    // GET API by ID
+    app.get('/products/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const result = await productsCollection.findOne(query);
+      res.send(result)
+    });
+
+    // UPDATE DELIVER PUT API
+    app.put('/products/:id', async(req, res) => {
+      const id = req.params.id;
+      const updateQuantity = req.body;
+      const filter= {_id:ObjectId(id)};
+      const options = {upsert : true}
+      const updateDoc = {
+        $set:{
+          quantity:updateQuantity.newQuantity 
+        }
+      };
+      const result = await productsCollection.updateOne(filter, updateDoc, options );
+      res.send(result)
     })
 
   }
