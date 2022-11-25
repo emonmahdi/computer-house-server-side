@@ -51,7 +51,33 @@ async function run(){
         }
       };
       const result = await productsCollection.updateOne(filter, updateDoc, options );
-      res.send(result)
+      res.send(result);
+    });
+
+    // POST API ADD PRODUCT.INVENTORY
+    app.post('/product', async(req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.send(result);
+      console.log(result);
+    });
+
+    // GET API BY SINGLE EMAIL ORDER
+    app.get('/product', async(req, res) => {
+      const email = req?.query?.email;
+      console.log(email);
+      const query = {email: email};
+      const result =  productsCollection.find(query);
+      const output = await result.toArray();
+      res.send(output)
+    })
+
+    // DELETE API PRODUCT
+    app.delete('/product/:id', async(req, res) => {
+      const id = req.params.id;
+      const item = {_id:ObjectId(id)}
+      const result = await productsCollection.deleteOne(item);
+      res.send(result);
     })
 
   }
